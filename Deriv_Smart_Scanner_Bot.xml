@@ -1,241 +1,127 @@
-<xml xmlns="https://developers.google.com/blockly/xml">
-  <!-- VARIABLE DEFINITIONS -->
+<xml xmlns="https://developers.google.com/blockly/xml"
+     is_dbot="true"
+     collection="false">
+
   <variables>
-    <variable id="stake">Stake</variable>
-    <variable id="initial_stake">Initial Stake</variable>
-    <variable id="win_stake">Win Stake</variable>
-    <variable id="target_profit">Target Profit</variable>
-    <variable id="stop_loss">Stop Loss</variable>
-    <variable id="total_profit">Total Profit</variable>
-    <variable id="ldp">Prediction Digit</variable>
-    <variable id="multiplier">Martingale Multiplier</variable>
+    <variable id="bulk_enabled">bulk_enabled</variable>
+    <variable id="trade_count">trade_count</variable>
+    <variable id="recovery_enabled">recovery_enabled</variable>
+    <variable id="recovery_level">recovery_level</variable>
+    <variable id="base_stake">base_stake</variable>
+    <variable id="current_stake">current_stake</variable>
+    <variable id="loss_count">loss_count</variable>
+    <variable id="signal_strength">signal_strength</variable>
+    <variable id="selected_contract">selected_contract</variable>
+    <variable id="profit_target">profit_target</variable>
+    <variable id="stop_loss">stop_loss</variable>
+    <variable id="ticks_collected">ticks_collected</variable>
   </variables>
 
-  <!-- BLOCK 1: TRADE DEFINITION & MARKET PARAMETERS -->
-  <block type="trade_definition" id="trade_def" x="0" y="0">
-    <statement name="TRADE_OPTIONS">
-      <block type="trade_definition_market" id="market_def">
-        <field name="MARKET_LIST">synthetic_index</field>
-        <field name="SUBMARKET_LIST">random_index</field>
-        <field name="SYMBOL_LIST">R_100</field>
-        <next>
-          <block type="trade_definition_tradetype" id="trade_type">
-            <field name="TRADETYPECAT_LIST">digits</field>
-            <field name="TRADETYPE_LIST">matchesdiffers</field>
-            <next>
-              <block type="trade_definition_contracttype" id="contract_type">
-                <field name="TYPE_LIST">DIGITMATCH</field>
-                <next>
-                  <block type="trade_definition_candleinterval" id="interval">
-                    <field name="CANDLEINTERVAL_LIST">60</field>
-                    <next>
-                      <block type="trade_definition_restartbuysell" id="restart_err">
-                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
+  <!-- ELISY254 SCANNER PRO X
+       SPECIFICATION: 1000 TICKS BEFORE FIRST TRADE
+       IMPORTANT: CUSTOM BLOCK LOGIC IS NOT IMPLEMENTED
+       BY THIS XML. NOT READY FOR DBOT EXECUTION.
+  -->
 
-    <!-- INITIALIZATION AT START -->
-    <statement name="INITIALIZATION">
-      <block type="variables_set" id="init_stake">
-        <field name="VAR" id="stake">Stake</field>
-        <value name="VALUE">
-          <block type="math_number" id="stk_val"><field name="NUM">1</field></block>
-        </value>
-        <next>
-          <block type="variables_set" id="init_winstake">
-            <field name="VAR" id="win_stake">Win Stake</field>
-            <value name="VALUE">
-              <block type="math_number" id="wstk_val"><field name="NUM">1</field></block>
-            </value>
-            <next>
-              <block type="variables_set" id="init_tp">
-                <field name="VAR" id="target_profit">Target Profit</field>
-                <value name="VALUE">
-                  <block type="math_number" id="tp_val"><field name="NUM">50</field></block>
-                </value>
-                <next>
-                  <block type="variables_set" id="init_sl">
-                    <field name="VAR" id="stop_loss">Stop Loss</field>
-                    <value name="VALUE">
-                      <block type="math_number" id="sl_val"><field name="NUM">30</field></block>
-                    </value>
-                    <next>
-                      <block type="variables_set" id="init_mult">
-                        <field name="VAR" id="multiplier">Martingale Multiplier</field>
-                        <value name="VALUE">
-                          <block type="math_number" id="mult_val"><field name="NUM">1.5</field></block>
-                        </value>
-                        <next>
-                          <block type="variables_set" id="init_ldp">
-                            <field name="VAR" id="ldp">Prediction Digit</field>
-                            <value name="VALUE">
-                              <block type="math_number" id="ldp_val"><field name="NUM">6</field></block>
-                            </value>
-                          </block>
-                        </next>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
+  <trade_definition>
+    <market>1HZ100V</market>
+    <trade_type>OVERUNDER</trade_type>
+    <duration>1</duration>
+    <duration_type>TICK</duration_type>
+  </trade_definition>
 
-    <!-- SUB-MARKET TICK DURATION & PREDICTION OPTION -->
-    <statement name="SUBMARKET">
-      <block type="trade_definition_tradeoptions" id="options">
-        <mutation has_prediction="true"></mutation>
-        <field name="DURATIONTYPE_LIST">t</field>
-        <value name="DURATION">
-          <block type="math_number" id="dur_val"><field name="NUM">1</field></block>
-        </value>
-        <value name="AMOUNT">
-          <block type="variables_get" id="get_stake">
-            <field name="VAR" id="stake">Stake</field>
-          </block>
-        </value>
-        <value name="PREDICTION">
-          <block type="variables_get" id="get_ldp">
-            <field name="VAR" id="ldp">Prediction Digit</field>
-          </block>
-        </value>
-      </block>
-    </statement>
-  </block>
+  <settings>
+    <turbo_mode>YES</turbo_mode>
+    <bulk_trade>YES</bulk_trade>
+    <trade_count>3</trade_count>
+    <base_stake>1</base_stake>
+    <recovery>YES</recovery>
+    <signal_minimum>70</signal_minimum>
+    <take_profit>5</take_profit>
+    <stop_loss>10</stop_loss>
+  </settings>
 
-  <!-- BLOCK 2: PRE-TRADE SCANNER & PURCHASE CONDITION -->
-  <block type="before_purchase" id="before_pur" x="450" y="0">
-    <statement name="BEFOREPURCHASE_STACK">
-      <!-- Read last digit list from tick history -->
-      <block type="notify" id="scan_msg">
-        <field name="NOTIFICATION_TYPE">info</field>
-        <field name="NOTIFICATION_SOUND">silent</field>
-        <value name="MESSAGE">
-          <block type="text_join" id="txt_join">
-            <mutation items="2"></mutation>
-            <value name="ADD0">
-              <block type="text" id="t1"><field name="TEXT">Scanning Last Digit: </field></block>
-            </value>
-            <value name="ADD1">
-              <block type="last_digit" id="ld_val"></block>
-            </value>
-          </block>
-        </value>
-        <next>
-          <!-- Trigger Purchase Rule -->
-          <block type="purchase" id="pur_action">
-            <field name="PURCHASE_LIST">DIGITMATCH</field>
-          </block>
-        </next>
-      </block>
-    </statement>
-  </block>
+  <scanner>
+    <scan_ticks>1000</scan_ticks>
+    <minimum_ticks_before_trade>1000</minimum_ticks_before_trade>
+    <wait_until_scan_complete>YES</wait_until_scan_complete>
+    <calculate_digit_frequency>YES</calculate_digit_frequency>
+    <calculate_signal/>
+    <require_signal_strength>70</require_signal_strength>
+    <no_trade_without_signal>YES</no_trade_without_signal>
+  </scanner>
 
-  <!-- BLOCK 3: AFTER PURCHASE RESULT & SMART RECOVERY BLOCK -->
-  <block type="after_purchase" id="after_pur" x="450" y="320">
-    <statement name="AFTERPURCHASE_STACK">
-      <!-- Check if Win -->
-      <block type="controls_if" id="check_win">
-        <mutation else="1"></mutation>
-        <value name="IF0">
-          <block type="contract_check_result" id="res_win">
-            <field name="CHECK_RESULT">win</field>
-          </block>
-        </value>
-        <statement name="DO0">
-          <block type="notify" id="win_notif">
-            <field name="NOTIFICATION_TYPE">success</field>
-            <field name="NOTIFICATION_SOUND">earned-money</field>
-            <value name="MESSAGE">
-              <block type="text" id="w_txt"><field name="TEXT">Trade Won! Resetting Stake...</field></block>
-            </value>
-            <next>
-              <block type="variables_set" id="reset_stk">
-                <field name="VAR" id="stake">Stake</field>
-                <value name="VALUE">
-                  <block type="variables_get" id="get_winstk">
-                    <field name="VAR" id="win_stake">Win Stake</field>
-                  </block>
-                </value>
-              </block>
-            </next>
-          </block>
-        </statement>
+  <contract_selector>
+    <rule priority="1">
+      <condition>digits_8_9_high</condition>
+      <contract>UNDER8</contract>
+    </rule>
+    <rule priority="2">
+      <condition>digits_7_8_9_high</condition>
+      <contract>UNDER7</contract>
+    </rule>
+    <rule priority="3">
+      <condition>digits_6_7_8_9_high</condition>
+      <contract>UNDER6</contract>
+    </rule>
+    <rule priority="4">
+      <condition>digits_0_1_2_high</condition>
+      <contract>OVER2</contract>
+    </rule>
+    <rule priority="5">
+      <condition>digits_0_1_2_3_4_high</condition>
+      <contract>OVER4</contract>
+    </rule>
+  </contract_selector>
 
-        <!-- Check if Loss -> Apply Smart Multiplier Recovery -->
-        <statement name="ELSE">
-          <block type="notify" id="loss_notif">
-            <field name="NOTIFICATION_TYPE">warn</field>
-            <field name="NOTIFICATION_SOUND">loss</field>
-            <value name="MESSAGE">
-              <block type="text" id="l_txt"><field name="TEXT">Trade Lost! Applying Recovery Stake...</field></block>
-            </value>
-            <next>
-              <block type="variables_set" id="apply_rec">
-                <field name="VAR" id="stake">Stake</field>
-                <value name="VALUE">
-                  <block type="math_arithmetic" id="calc_stk">
-                    <field name="OP">MULTIPLY</field>
-                    <value name="A">
-                      <block type="variables_get" id="curr_stk">
-                        <field name="VAR" id="stake">Stake</field>
-                      </block>
-                    </value>
-                    <value name="B">
-                      <block type="variables_get" id="curr_mult">
-                        <field name="VAR" id="multiplier">Martingale Multiplier</field>
-                      </block>
-                    </value>
-                  </block>
-                </value>
-              </block>
-            </next>
-          </block>
-        </statement>
+  <bulk_trading>
+    <enabled>YES</enabled>
+    <trades_per_batch>3</trades_per_batch>
+    <require_valid_signal>YES</require_valid_signal>
+    <require_completed_initial_scan>YES</require_completed_initial_scan>
+  </bulk_trading>
 
-        <!-- Check Stop Loss and Take Profit Thresholds -->
-        <next>
-          <block type="controls_if" id="tp_sl_check">
-            <mutation else="1"></mutation>
-            <value name="IF0">
-              <block type="logic_compare" id="chk_tp">
-                <field name="OP">LT</field>
-                <value name="A">
-                  <block type="total_profit" id="tot_prof"></block>
-                </value>
-                <value name="B">
-                  <block type="variables_get" id="get_tp">
-                    <field name="VAR" id="target_profit">Target Profit</field>
-                  </block>
-                </value>
-              </block>
-            </value>
-            <statement name="DO0">
-              <block type="trade_again" id="again_action"></block>
-            </statement>
-            <statement name="ELSE">
-              <block type="notify" id="stop_msg">
-                <field name="NOTIFICATION_TYPE">info</field>
-                <field name="NOTIFICATION_SOUND">silent</field>
-                <value name="MESSAGE">
-                  <block type="text" id="s_txt"><field name="TEXT">Target Profit or Stop Loss Hit! Session Stopped.</field></block>
-                </value>
-              </block>
-            </statement>
-          </block>
-        </next>
-      </block>
-    </statement>
-  </block>
+  <recovery_levels>
+    <level id="0">1</level>
+    <level id="1">1.8</level>
+    <level id="2">3.2</level>
+    <level id="3">5.8</level>
+    <level id="4">10.5</level>
+    <maximum_level>4</maximum_level>
+  </recovery_levels>
+
+  <on_win>
+    <reset_recovery/>
+    <reset_stake/>
+    <reset_loss_counter/>
+  </on_win>
+
+  <on_loss>
+    <increase_recovery_level/>
+    <increase_loss_counter/>
+  </on_loss>
+
+  <protection>
+    <pause_after_losses>3</pause_after_losses>
+    <pause_ticks>20</pause_ticks>
+    <max_losses>5</max_losses>
+    <profit_target>5</profit_target>
+    <drawdown_limit>10</drawdown_limit>
+    <stop_when_limit_reached>YES</stop_when_limit_reached>
+  </protection>
+
+  <trade_loop>
+    <step>CONNECT_TO_LIVE_MARKET</step>
+    <step>COLLECT_1000_TICKS</step>
+    <step>CALCULATE_DIGIT_FREQUENCIES</step>
+    <step>CALCULATE_SIGNAL_STRENGTH</step>
+    <step>WAIT_IF_SIGNAL_INVALID</step>
+    <step>SELECT_CONTRACT</step>
+    <step>CHECK_RISK_LIMITS</step>
+    <step>OPEN_BATCH_OF_3_TRADES</step>
+    <step>CHECK_TRADE_RESULTS</step>
+    <step>UPDATE_RECOVERY_LEVEL</step>
+    <step>REPEAT_WHILE_WITHIN_LIMITS</step>
+  </trade_loop>
+
 </xml>
