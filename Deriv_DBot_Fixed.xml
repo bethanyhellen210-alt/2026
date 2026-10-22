@@ -1,82 +1,49 @@
-<xml xmlns="https://developers.google.com/blockly/xml">
-  <!-- MAIN VARIABLE DECLARATIONS -->
+<xml xmlns="https://developers.google.com/blockly/xml"
+     is_dbot="true"
+     collection="false">
+
   <variables>
-    <variable id="stake_var">Stake</variable>
-    <variable id="win_stake_var">Win Stake</variable>
-    <variable id="tp_var">Target Profit</variable>
-    <variable id="sl_var">Stop Loss</variable>
-    <variable id="ldp_var">Prediction Digit</variable>
-    <variable id="mult_var">Recovery Multiplier</variable>
+    <variable>ticks_collected</variable>
   </variables>
 
-  <!-- BLOCK 1: TRADE DEFINITION (DERIV MANDATORY) -->
-  <block type="trade_definition" id="trade_def_root" x="0" y="0">
+  <block type="trade_definition" id="elisy_trade_definition"
+         deletable="false" x="0" y="0">
+
     <statement name="TRADE_OPTIONS">
-      <block type="trade_definition_market" id="market_config">
+      <block type="trade_definition_market" id="elisy_market"
+             deletable="false" movable="false">
         <field name="MARKET_LIST">synthetic_index</field>
         <field name="SUBMARKET_LIST">random_index</field>
-        <field name="SYMBOL_LIST">R_100</field>
-        <next>
-          <block type="trade_definition_tradetype" id="tradetype_config">
-            <field name="TRADETYPECAT_LIST">digits</field>
-            <field name="TRADETYPE_LIST">matchesdiffers</field>
-            <next>
-              <block type="trade_definition_contracttype" id="contract_config">
-                <field name="TYPE_LIST">DIGITMATCH</field>
-                <next>
-                  <block type="trade_definition_candleinterval" id="candle_config">
-                    <field name="CANDLEINTERVAL_LIST">60</field>
-                    <next>
-                      <block type="trade_definition_restartbuysell" id="restart_config">
-                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
-                      </block>
-                    </next>
-                  </block>
-                </next>
-              </block>
-            </next>
-          </block>
-        </next>
-      </block>
-    </statement>
+        <field name="SYMBOL_LIST">1HZ100V</field>
 
-    <!-- INITIALIZATION SETTINGS -->
-    <statement name="INITIALIZATION">
-      <block type="variables_set" id="set_stk">
-        <field name="VAR" id="stake_var">Stake</field>
-        <value name="VALUE">
-          <block type="math_number" id="stk_num"><field name="NUM">1</field></block>
-        </value>
         <next>
-          <block type="variables_set" id="set_winstk">
-            <field name="VAR" id="win_stake_var">Win Stake</field>
-            <value name="VALUE">
-              <block type="math_number" id="winstk_num"><field name="NUM">1</field></block>
-            </value>
+          <block type="trade_definition_tradetype" id="elisy_trade_type"
+                 deletable="false" movable="false">
+            <field name="TRADETYPECAT_LIST">digits</field>
+            <field name="TRADETYPE_LIST">overunder</field>
+
             <next>
-              <block type="variables_set" id="set_tp">
-                <field name="VAR" id="tp_var">Target Profit</field>
-                <value name="VALUE">
-                  <block type="math_number" id="tp_num"><field name="NUM">50</field></block>
-                </value>
+              <block type="trade_definition_contracttype" id="elisy_contract"
+                     deletable="false" movable="false">
+                <field name="TYPE_LIST">DIGITUNDER</field>
+
                 <next>
-                  <block type="variables_set" id="set_sl">
-                    <field name="VAR" id="sl_var">Stop Loss</field>
-                    <value name="VALUE">
-                      <block type="math_number" id="sl_num"><field name="NUM">30</field></block>
-                    </value>
+                  <block type="trade_definition_candleinterval"
+                         id="elisy_interval"
+                         deletable="false" movable="false">
+                    <field name="CANDLEINTERVAL_LIST">60</field>
+
                     <next>
-                      <block type="variables_set" id="set_ldp">
-                        <field name="VAR" id="ldp_var">Prediction Digit</field>
-                        <value name="VALUE">
-                          <block type="math_number" id="ldp_num"><field name="NUM">6</field></block>
-                        </value>
+                      <block type="trade_definition_restartbuysell"
+                             id="elisy_restart"
+                             deletable="false" movable="false">
+                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
+
                         <next>
-                          <block type="variables_set" id="set_mult">
-                            <field name="VAR" id="mult_var">Recovery Multiplier</field>
-                            <value name="VALUE">
-                              <block type="math_number" id="mult_num"><field name="NUM">1</field></block>
-                            </value>
+                          <block type="trade_definition_restartonerror"
+                                 id="elisy_restart_error"
+                                 deletable="false" movable="false">
+                            <field name="RESTARTONERROR">FALSE</field>
                           </block>
                         </next>
                       </block>
@@ -90,81 +57,109 @@
       </block>
     </statement>
 
-    <!-- SUBMARKET EXECUTION OPTIONS -->
     <statement name="SUBMARKET">
-      <block type="trade_definition_tradeoptions" id="trade_options_config">
-        <mutation has_prediction="true"></mutation>
-        <field name="DURATIONTYPE_LIST">t</field>
-        <value name="DURATION">
-          <block type="math_number" id="dur_num"><field name="NUM">1</field></block>
-        </value>
-        <value name="AMOUNT">
-          <block type="variables_get" id="get_stk_val">
-            <field name="VAR" id="stake_var">Stake</field>
+      <block type="variables_set" id="elisy_initialize_counter">
+        <field name="VAR">ticks_collected</field>
+        <value name="VALUE">
+          <block type="math_number" id="elisy_zero">
+            <field name="NUM">0</field>
           </block>
         </value>
-        <value name="PREDICTION">
-          <block type="variables_get" id="get_ldp_val">
-            <field name="VAR" id="ldp_var">Prediction Digit</field>
-          </block>
-        </value>
-      </block>
-    </statement>
-  </block>
 
-  <!-- BLOCK 2: BEFORE PURCHASE -->
-  <block type="before_purchase" id="before_pur_root" x="480" y="0">
-    <statement name="BEFOREPURCHASE_STACK">
-      <block type="purchase" id="do_purchase">
-        <field name="PURCHASE_LIST">DIGITMATCH</field>
-      </block>
-    </statement>
-  </block>
-
-  <!-- BLOCK 3: AFTER PURCHASE RECOVERY & STATS -->
-  <block type="after_purchase" id="after_pur_root" x="480" y="180">
-    <statement name="AFTERPURCHASE_STACK">
-      <block type="controls_if" id="check_result_if">
-        <mutation else="1"></mutation>
-        <value name="IF0">
-          <block type="contract_check_result" id="check_win">
-            <field name="CHECK_RESULT">win</field>
-          </block>
-        </value>
-        <statement name="DO0">
-          <block type="variables_set" id="reset_stake_win">
-            <field name="VAR" id="stake_var">Stake</field>
-            <value name="VALUE">
-              <block type="variables_get" id="get_winstk_val">
-                <field name="VAR" id="win_stake_var">Win Stake</field>
-              </block>
-            </value>
-          </block>
-        </statement>
-        <statement name="ELSE">
-          <block type="variables_set" id="apply_recovery">
-            <field name="VAR" id="stake_var">Stake</field>
-            <value name="VALUE">
-              <block type="math_arithmetic" id="multiply_stake">
-                <field name="OP">MULTIPLY</field>
-                <value name="A">
-                  <block type="variables_get" id="curr_stk_get">
-                    <field name="VAR" id="stake_var">Stake</field>
-                  </block>
-                </value>
-                <value name="B">
-                  <block type="variables_get" id="mult_get">
-                    <field name="VAR" id="mult_var">Recovery Multiplier</field>
-                  </block>
-                </value>
-              </block>
-            </value>
-          </block>
-        </statement>
         <next>
-          <block type="trade_again" id="trade_again_act"></block>
+          <block type="trade_definition_tradeoptions"
+                 id="elisy_trade_options">
+            <mutation xmlns="http://www.w3.org/1999/xhtml"
+                      has_first_barrier="false"
+                      has_second_barrier="false"
+                      has_prediction="true"></mutation>
+
+            <field name="DURATIONTYPE_LIST">t</field>
+
+            <value name="DURATION">
+              <shadow type="math_number_positive" id="elisy_duration">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+
+            <value name="AMOUNT">
+              <shadow type="math_number_positive" id="elisy_stake">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+
+            <value name="PREDICTION">
+              <shadow type="math_number_positive" id="elisy_prediction">
+                <field name="NUM">6</field>
+              </shadow>
+            </value>
+          </block>
         </next>
       </block>
     </statement>
   </block>
+
+  <block type="tick_analysis" id="elisy_tick_scanner"
+         collapsed="false" x="650" y="0">
+    <statement name="TICKANALYSIS_STACK">
+      <block type="math_change" id="elisy_increment_tick">
+        <field name="VAR">ticks_collected</field>
+        <value name="DELTA">
+          <shadow type="math_number" id="elisy_increment_one">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </statement>
+  </block>
+
+  <block type="before_purchase" id="elisy_before_purchase"
+         deletable="false" x="0" y="650">
+    <statement name="BEFOREPURCHASE_STACK">
+      <block type="controls_if" id="elisy_wait_for_1000">
+        <value name="IF0">
+          <block type="logic_compare" id="elisy_compare_ticks">
+            <field name="OP">GTE</field>
+
+            <value name="A">
+              <block type="variables_get" id="elisy_read_ticks">
+                <field name="VAR">ticks_collected</field>
+              </block>
+            </value>
+
+            <value name="B">
+              <block type="math_number" id="elisy_required_ticks">
+                <field name="NUM">1000</field>
+              </block>
+            </value>
+          </block>
+        </value>
+
+        <statement name="DO0">
+          <block type="purchase" id="elisy_buy_under6">
+            <field name="PURCHASE_LIST">DIGITUNDER</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+
+  <block type="during_purchase" id="elisy_during_purchase"
+         x="650" y="350">
+    <statement name="DURING_PURCHASE_STACK">
+      <block type="controls_if" id="elisy_sell_check">
+        <value name="IF0">
+          <block type="check_sell" id="elisy_check_sell"></block>
+        </value>
+      </block>
+    </statement>
+  </block>
+
+  <block type="after_purchase" id="elisy_after_purchase"
+         x="650" y="600">
+    <statement name="AFTERPURCHASE_STACK">
+      <block type="trade_again" id="elisy_trade_again"></block>
+    </statement>
+  </block>
+
 </xml>
